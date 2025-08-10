@@ -1,0 +1,86 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+    "name": "AI Job Application Bot",
+    "description": "A collection to control and test the AI-powered Upwork job application bot.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Start Scraping and AI Analysis",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/jobs/scrape",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "jobs", "scrape"]
+        },
+        "description": "This starts the background process of scraping Upwork for new jobs and analyzing them with AI. \n\n**What to Expect:**\n- You will get an immediate `202 Accepted` response.\n- The real work happens in the background. **Watch your server's terminal** to see the logs of the scraper and AI analysis in real-time."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get All Processed Jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/jobs",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "jobs"]
+        },
+        "description": "Retrieves all jobs that have been saved to the MongoDB database, sorted by the newest first. This is useful for seeing everything the bot has processed."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get ONLY Good Matches (AI Filtered)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/jobs?matchesOnly=true",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "jobs"],
+          "query": [
+            {
+              "key": "matchesOnly",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "This is the most useful query. It filters the jobs and returns **only the ones that the AI has flagged with `isMatch: true`**.\n\n**Workflow:**\n1. Run this request after the scraper has processed some jobs.\n2. Look through the results and find a job you want to apply for.\n3. **Copy the `_id` value** of that job. You will need it for the next step."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Apply for a Specific Job",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/jobs/:jobId/apply",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "jobs", ":jobId", "apply"],
+          "variable": [
+            {
+              "key": "jobId",
+              "value": "PASTE_YOUR_JOB_ID_HERE",
+              "description": "Get this ID from the response of the 'Get ONLY Good Matches' request."
+            }
+          ]
+        },
+        "description": "🚨 **WARNING: This can get your Upwork account banned. Use with caution on a test account.** 🚨\n\nThis triggers the automated application process for a single job.\n\n**How to Use:**\n1. Run the 'Get ONLY Good Matches' request first.\n2. Copy the `_id` of a job from its response.\n3. In this request, go to the 'Params' tab.\n4. Paste the ID into the **VALUE** field for the `jobId` path variable.\n5. Hit Send.\n\n**What to Expect:**\n- You will get an immediate `202 Accepted` response.\n- A new browser window will open on your computer and perform the login and application steps automatically."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:5001",
+      "type": "string"
+    }
+  ]
+}
